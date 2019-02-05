@@ -255,6 +255,7 @@ fn model(app: &App) -> Model {
                 joint_cutoff: 0.01,
                 rotation_cutoff: 0.34,
             };
+            /*
             let poses: npe::PoseData = poses::read_poses()
                 .into_iter()
                 .map(|pr| {
@@ -264,21 +265,22 @@ fn model(app: &App) -> Model {
                     (npe::Pose::from_name(&pr.name).expect("Failed to match pose name"), data)
                 })
                 .collect();
+                */
 
-            Some(npe::Detector::with_poses(settings, poses))
+            Some(npe::Detector::new(settings))
         },
         _ => None,
     };
     let nui_join_handle = std::thread::spawn(move || {
-        /*
-        let path = std::path::PathBuf::from("/home/tom/devbox/rust/nuitrack-rs/recording-1548337564.snap");
+        let path = std::path::PathBuf::from("/home/tom/devbox/rust/nuitrack-rs/recording-1549337913.snap");
         let mut nui = nuitrack_rs::playback(path, true).expect("Failed to make player");
-        */
+        /*
         let mut nui = nuitrack_rs::init()
             .expect("Couldn't create nui");
         
         nui.set_camera_rotation(90)
             .expect("Failed to rotate");
+            */
 
         nui.skeleton_data(move |data| {
             let mut debug_poses = Vec::new();
@@ -329,25 +331,29 @@ fn model(app: &App) -> Model {
         }).expect("Failed to add callback");
 
         nui.depth_data(move |data| {
+            /*
             let depth = DepthFrame {
                 rows: data.rows as _,
                 cols: data.cols as _,
                 data: data.frame().to_vec(),
             };
             depth_tx.send(depth).ok();
+            */
         }).expect("Failed to add callback");
 
         nui.color_data(move |data| {
+            /*
             let color = ColorFrame {
                 rows: data.rows as _,
                 cols: data.cols as _,
                 data: data.frame().to_vec(),
             };
             color_tx.send(color).ok();
+            */
         }).expect("Failed to add callback");
 
 
-        let nui = nui.run().expect("failed to run nui");
+        //let nui = nui.run().expect("failed to run nui");
 
         // Run at ~30fps forever.
         loop {
@@ -355,7 +361,7 @@ fn model(app: &App) -> Model {
                 Ok(_) => break,
                 Err(_) => {
                     nui.update().expect("failed to update nui player");
-                    //std::thread::sleep(std::time::Duration::from_millis(60));
+                    std::thread::sleep(std::time::Duration::from_millis(60));
                 },
             }
         }
